@@ -1,0 +1,15 @@
+[project]
+name = "tea-fcc"
+version = "0.1.0"
+description = "FCC ULS Land Mobile Database Downloader and SQLite Storage"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.31.0",
+    "schedule>=1.2.0",
+    "python-dateutil>=2.8.2",
+    "tqdm>=4.66.0",
+    "beautifulsoup4>=4.13.0",
+    "flask>=3.1.1",
+    "gunicorn>=23.0.0",
+]

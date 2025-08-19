@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+
+{% block title %}FCC ULS Lookup - Search{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-radio text-info"></i> 
+            FCC ULS Land Mobile Database Lookup
+        </h1>
+        
+        <p class="text-center mb-5" style="color: var(--text-secondary);">
+            Search the FCC Universal Licensing System database for land mobile radio licenses, 
+            frequencies, and contact information.
+        </p>
+        
+        <!-- Search Tabs -->
+        <ul class="nav nav-tabs" id="searchTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="callsign-tab" data-bs-toggle="tab" 
+                        data-bs-target="#callsign-search" type="button" role="tab">
+                    <i class="fas fa-id-card"></i> Callsign Lookup
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="licensee-tab" data-bs-toggle="tab" 
+                        data-bs-target="#licensee-search" type="button" role="tab">
+                    <i class="fas fa-user"></i> Licensee Search
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="frequency-tab" data-bs-toggle="tab" 
+                        data-bs-target="#frequency-search" type="button" role="tab">
+                    <i class="fas fa-wave-square"></i> Frequency Search
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content mt-4" id="searchTabsContent">
+            <!-- Callsign Search -->
+            <div class="tab-pane fade show active" id="callsign-search" role="tabpanel">
+                <div class="card search-card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-id-card text-info"></i> 
+                            Lookup by Callsign
+                        </h5>
+                        <p class="card-text" style="color: var(--text-secondary);">
+                            Enter a specific callsign to view detailed license information, 
+                            frequencies, and contact details.
+                        </p>
+                        
+                        <form id="callsign-form">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control form-control-lg" 
+                                           id="callsign-input" placeholder="Enter callsign (e.g., KA21141)"
+                                           maxlength="10" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-search"></i> Lookup
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="callsign-loading" class="loading text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Looking up callsign...</p>
+                </div>
+                
+                <div id="callsign-results"></div>
+            </div>
+            
+            <!-- Licensee Search -->
+            <div class="tab-pane fade" id="licensee-search" role="tabpanel">
+                <div class="card search-card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-user text-success"></i> 
+                            Search by Licensee Name
+                        </h5>
+                        <p class="card-text" style="color: var(--text-secondary);">
+                            Search for licenses by the actual licensee name (license holder).
+                        </p>
+                        
+                        <form id="licensee-form">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" 
+                                           id="licensee-name" placeholder="Licensee name"
+                                           required>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" 
+                                           id="licensee-state" placeholder="State (optional)"
+                                           maxlength="2">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" 
+                                           id="licensee-limit" placeholder="Limit"
+                                           value="150" min="1" max="1000">
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="licensee-loading" class="loading text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Searching licensees...</p>
+                </div>
+                
+                <div id="licensee-results"></div>
+            </div>
+            
+            <!-- Frequency Search -->
+            <div class="tab-pane fade" id="frequency-search" role="tabpanel">
+                <div class="card search-card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-wave-square text-danger"></i> 
+                            Search by Frequency
+                        </h5>
+                        <p class="card-text" style="color: var(--text-secondary);">
+                            Find all licenses using a specific frequency within a tolerance range.
+                        </p>
+                        
+                        <form id="frequency-form">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="number" class="form-control" 
+                                           id="frequency-input" placeholder="Frequency (MHz)"
+                                           step="0.000001" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" 
+                                           id="frequency-tolerance" placeholder="Tolerance"
+                                           value="0.001" step="0.000001" min="0">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" 
+                                           id="frequency-state" placeholder="State"
+                                           maxlength="2">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" 
+                                           id="frequency-limit" placeholder="Limit"
+                                           value="150" min="1" max="1000">
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="frequency-loading" class="loading text-center">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Searching frequencies...</p>
+                </div>
+                
+                <div id="frequency-results"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Callsign lookup
+document.getElementById('callsign-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const callsign = document.getElementById('callsign-input').value.trim().toUpperCase();
+    if (!callsign) return;
+    
+    showLoading('callsign-loading');
+    clearResults('callsign-results');
+    
+    fetch(`/api/callsign/${callsign}`)
+        .then(response => response.json())
+        .then(data => {
+            hideLoading('callsign-loading');
+            
+            if (data.error) {
+                showError('callsign-results', data.error);
+                return;
+            }
+            
+            // Redirect to detailed view
+            window.location.href = `/callsign/${callsign}`;
+        })
+        .catch(error => {
+            hideLoading('callsign-loading');
+            showError('callsign-results', 'Search failed: ' + error.message);
+        });
+});
+
+// Licensee search
+document.getElementById('licensee-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('licensee-name').value.trim();
+    const state = document.getElementById('licensee-state').value.trim();
+    const limit = document.getElementById('licensee-limit').value;
+    
+    if (!name) return;
+    
+    showLoading('licensee-loading');
+    clearResults('licensee-results');
+    
+    const params = new URLSearchParams({
+        name: name,
+        limit: limit
+    });
+    
+    if (state) {
+        params.append('state', state.toUpperCase());
+    }
+    
+    fetch(`/api/search/licensee?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            hideLoading('licensee-loading');
+            
+            if (data.error) {
+                showError('licensee-results', data.error);
+                return;
+            }
+            
+            displayLicenseeResults(data);
+        })
+        .catch(error => {
+            hideLoading('licensee-loading');
+            showError('licensee-results', 'Search failed: ' + error.message);
+        });
+});
+
+// Frequency search
+document.getElementById('frequency-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const frequency = document.getElementById('frequency-input').value;
+    const tolerance = document.getElementById('frequency-tolerance').value;
+    const state = document.getElementById('frequency-state').value.trim();
+    const limit = document.getElementById('frequency-limit').value;
+    
+    if (!frequency) return;
+    
+    showLoading('frequency-loading');
+    clearResults('frequency-results');
+    
+    const params = new URLSearchParams({
+        frequency: frequency,
+        tolerance: tolerance,
+        limit: limit
+    });
+    
+    if (state) {
+        params.append('state', state.toUpperCase());
+    }
+    
+    fetch(`/api/search/frequency?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            hideLoading('frequency-loading');
+            
+            if (data.error) {
+                showError('frequency-results', data.error);
+                return;
+            }
+            
+            displayFrequencyResults(data);
+        })
+        .catch(error => {
+            hideLoading('frequency-loading');
+            showError('frequency-results', 'Search failed: ' + error.message);
+        });
+});
+
+function displayLicenseeResults(data) {
+    const resultsDiv = document.getElementById('licensee-results');
+    
+    if (data.results.length === 0) {
+        resultsDiv.innerHTML = '<div class="alert alert-info">No results found for the specified search criteria.</div>';
+        return;
+    }
+    
+    let html = `
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user text-success"></i> 
+                    Licensee Search Results (${data.count} found)
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Callsign</th>
+                                <th>Licensee Name</th>
+                                <th>Location</th>
+                                <th>Grant Date</th>
+                                <th>Expiration</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    `;
+    
+    data.results.forEach(result => {
+        const [callsign, entity_name, first_name, last_name, city, state, grant_date, expired_date] = result;
+        const fullName = entity_name || `${first_name || ''} ${last_name || ''}`.trim();
+        const location = `${city || ''}, ${state || ''}`.replace(/^,\s*|,\s*$/g, '') || 'Not specified';
+        
+        // Build return URL with search context
+        const returnParams = new URLSearchParams({
+            search_type: 'licensee',
+            name: data.search_params.name || '',
+            state: data.search_params.state || '',
+            limit: data.search_params.limit || 150
+        });
+        const returnUrl = `/?${returnParams.toString()}#licensee-results`;
+        const detailUrl = `/callsign/${callsign}?return=${encodeURIComponent(returnUrl)}`;
+        
+        html += `
+            <tr>
+                <td><a href="${detailUrl}" class="btn btn-sm btn-outline-primary">${callsign}</a></td>
+                <td>${fullName}</td>
+                <td>${location}</td>
+                <td>${formatDate(grant_date)}</td>
+                <td>${formatDate(expired_date)}</td>
+                <td><a href="${detailUrl}" class="btn btn-sm btn-primary">View Details</a></td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    resultsDiv.innerHTML = html;
+}
+
+function displayFrequencyResults(data) {
+    const resultsDiv = document.getElementById('frequency-results');
+    
+    if (data.results.length === 0) {
+        resultsDiv.innerHTML = '<div class="alert alert-info">No results found for the specified frequency.</div>';
+        return;
+    }
+    
+    let html = `
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-wave-square text-danger"></i> 
+                    Frequency Search Results (${data.count} found)
+                </h5>
+                <small class="text-muted">
+                    Frequency: ${data.search_params.frequency} MHz ±${data.search_params.tolerance} MHz
+                </small>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Callsign</th>
+                                <th>Licensee</th>
+                                <th>Location</th>
+                                <th>Frequency</th>
+                                <th>Power Output</th>
+                                <th>ERP</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    `;
+    
+    data.results.forEach(result => {
+        const [callsign, entity_name, first_name, last_name, city, state, frequency, power_output, power_erp] = result;
+        const fullName = entity_name || `${first_name || ''} ${last_name || ''}`.trim();
+        const location = `${city || ''}, ${state || ''}`.replace(/^,\s*|,\s*$/g, '') || 'Not specified';
+        
+        // Build return URL with search context
+        const returnParams = new URLSearchParams({
+            search_type: 'frequency',
+            frequency: data.search_params.frequency || '',
+            tolerance: data.search_params.tolerance || 0.001,
+            state: data.search_params.state || '',
+            limit: data.search_params.limit || 150
+        });
+        const returnUrl = `/?${returnParams.toString()}#frequency-results`;
+        const detailUrl = `/callsign/${callsign}?return=${encodeURIComponent(returnUrl)}`;
+        
+        html += `
+            <tr>
+                <td><a href="${detailUrl}" class="btn btn-sm btn-outline-primary">${callsign}</a></td>
+                <td>${fullName}</td>
+                <td>${location}</td>
+                <td>${formatFrequency(frequency)}</td>
+                <td>${formatPower(power_output)}</td>
+                <td>${formatPower(power_erp)}</td>
+                <td><a href="${detailUrl}" class="btn btn-sm btn-primary">View Details</a></td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    resultsDiv.innerHTML = html;
+}
+
+// Auto-uppercase inputs
+document.getElementById('callsign-input').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+
+document.getElementById('licensee-state').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+
+document.getElementById('frequency-state').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+
+// Restore search state from URL parameters (when returning from detail page)
+function restoreSearchState() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchType = urlParams.get('search_type');
+    
+    if (searchType === 'licensee') {
+        // Switch to licensee tab
+        const licenseeTab = document.getElementById('licensee-tab');
+        const licenseeTabPane = document.getElementById('licensee-search');
+        
+        // Activate tab
+        document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        
+        licenseeTab.classList.add('active');
+        licenseeTabPane.classList.add('show', 'active');
+        
+        // Restore form values
+        const name = urlParams.get('name');
+        const state = urlParams.get('state');
+        const limit = urlParams.get('limit');
+        
+        if (name) document.getElementById('licensee-name').value = name;
+        if (state) document.getElementById('licensee-state').value = state;
+        if (limit) document.getElementById('licensee-limit').value = limit;
+        
+        // Auto-execute search
+        if (name) {
+            setTimeout(() => {
+                document.getElementById('licensee-form').dispatchEvent(new Event('submit'));
+            }, 100);
+        }
+    } else if (searchType === 'frequency') {
+        // Switch to frequency tab
+        const frequencyTab = document.getElementById('frequency-tab');
+        const frequencyTabPane = document.getElementById('frequency-search');
+        
+        // Activate tab
+        document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        
+        frequencyTab.classList.add('active');
+        frequencyTabPane.classList.add('show', 'active');
+        
+        // Restore form values
+        const frequency = urlParams.get('frequency');
+        const tolerance = urlParams.get('tolerance');
+        const state = urlParams.get('state');
+        const limit = urlParams.get('limit');
+        
+        if (frequency) document.getElementById('frequency-input').value = frequency;
+        if (tolerance) document.getElementById('frequency-tolerance').value = tolerance;
+        if (state) document.getElementById('frequency-state').value = state;
+        if (limit) document.getElementById('frequency-limit').value = limit;
+        
+        // Auto-execute search
+        if (frequency) {
+            setTimeout(() => {
+                document.getElementById('frequency-form').dispatchEvent(new Event('submit'));
+            }, 100);
+        }
+    }
+}
+
+// Run restore function when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    restoreSearchState();
+});
+</script>
+{% endblock %}

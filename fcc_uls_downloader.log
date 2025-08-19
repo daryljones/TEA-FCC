@@ -1,0 +1,178 @@
+2025-08-17 19:31:32,581 - INFO - Database initialized successfully
+2025-08-17 19:31:42,805 - INFO - Database initialized successfully
+2025-08-17 19:31:42,805 - INFO - Checking dataset information...
+2025-08-17 19:31:57,856 - WARNING -   LM_PRIVATE_LICENSES: Error - HTTPSConnectionPool(host='data.fcc.gov', port=443): Read timed out. (read timeout=15)
+2025-08-17 19:32:12,885 - WARNING -   LM_PRIVATE_APPLICATIONS: Error - HTTPSConnectionPool(host='data.fcc.gov', port=443): Read timed out. (read timeout=15)
+2025-08-17 19:33:29,752 - INFO - Database initialized successfully
+2025-08-17 19:33:29,752 - INFO - Starting immediate download
+2025-08-17 19:33:29,752 - INFO - Starting download using curl (reliable method)...
+2025-08-17 19:33:29,752 - INFO - Downloading LM_licenses_20250817.zip from https://data.fcc.gov/download/pub/uls/complete/l_LMpriv.zip using curl (attempt 1/3)
+2025-08-17 19:33:29,752 - INFO - Running: curl -L -C - --progress-bar --max-time 600 --retry ... https://data.fcc.gov/download/pub/uls/complete/l_LMpriv.zip
+2025-08-17 19:35:37,641 - INFO - Downloaded LM_licenses_20250817.zip successfully (396,343,611 bytes)
+2025-08-17 19:35:40,205 - INFO - Extracted downloads/LM_licenses_20250817.zip to downloads/extracted_LM_licenses_20250817
+2025-08-17 19:36:10,777 - INFO - Processed 5604276 records from downloads/extracted_LM_licenses_20250817/FR.dat
+2025-08-17 19:36:10,777 - INFO - Processed 5604276 records from FR.dat into frequencies table
+2025-08-17 19:36:20,486 - INFO - Processed 1488715 records from downloads/extracted_LM_licenses_20250817/EN.dat
+2025-08-17 19:36:20,486 - INFO - Processed 1488715 records from EN.dat into entities table
+2025-08-17 19:36:29,712 - INFO - Processed 848539 records from downloads/extracted_LM_licenses_20250817/HD.dat
+2025-08-17 19:36:29,712 - INFO - Processed 848539 records from HD.dat into licenses table
+2025-08-17 19:37:10,899 - INFO - Processed 1973095 records from downloads/extracted_LM_licenses_20250817/LO.dat
+2025-08-17 19:37:10,899 - INFO - Processed 1973095 records from LO.dat into locations table
+2025-08-17 19:37:43,249 - INFO - Processed 2019307 records from downloads/extracted_LM_licenses_20250817/AN.dat
+2025-08-17 19:37:43,249 - INFO - Processed 2019307 records from AN.dat into antennas table
+2025-08-17 19:37:43,249 - INFO - Downloading LM_applications_20250817.zip from https://data.fcc.gov/download/pub/uls/complete/a_LMpriv.zip using curl (attempt 1/3)
+2025-08-17 19:37:43,250 - INFO - Running: curl -L -C - --progress-bar --max-time 600 --retry ... https://data.fcc.gov/download/pub/uls/complete/a_LMpriv.zip
+2025-08-17 19:42:06,508 - INFO - Downloaded LM_applications_20250817.zip successfully (667,456,865 bytes)
+2025-08-17 19:42:10,982 - INFO - Extracted downloads/LM_applications_20250817.zip to downloads/extracted_LM_applications_20250817
+2025-08-17 19:42:38,819 - INFO - Processed 5117409 records from downloads/extracted_LM_applications_20250817/FR.dat
+2025-08-17 19:42:38,819 - INFO - Processed 5117409 records from FR.dat into frequencies table
+2025-08-17 19:43:12,270 - INFO - Processed 5003982 records from downloads/extracted_LM_applications_20250817/EN.dat
+2025-08-17 19:43:12,270 - INFO - Processed 5003982 records from EN.dat into entities table
+2025-08-17 19:43:42,342 - INFO - Processed 2658706 records from downloads/extracted_LM_applications_20250817/HD.dat
+2025-08-17 19:43:42,344 - INFO - Processed 2658706 records from HD.dat into licenses table
+2025-08-17 19:44:10,145 - INFO - Processed 1328320 records from downloads/extracted_LM_applications_20250817/LO.dat
+2025-08-17 19:44:10,145 - INFO - Processed 1328320 records from LO.dat into locations table
+2025-08-17 19:44:30,836 - INFO - Processed 1287717 records from downloads/extracted_LM_applications_20250817/AN.dat
+2025-08-17 19:44:30,836 - INFO - Processed 1287717 records from AN.dat into antennas table
+2025-08-17 19:44:30,840 - INFO - Download and processing completed. Total records: 27330066
+2025-08-18 13:39:58,565 - INFO - Database initialized successfully
+2025-08-18 13:39:58,566 - INFO - Starting immediate download
+2025-08-18 13:39:58,566 - INFO - Starting download using curl (reliable method)...
+2025-08-18 13:39:58,566 - INFO - Downloading LM_licenses_20250818.zip from https://data.fcc.gov/download/pub/uls/complete/l_LMpriv.zip using curl (attempt 1/3)
+2025-08-18 13:39:58,567 - INFO - Running: curl -L -C - --progress-bar --max-time 600 --retry ... https://data.fcc.gov/download/pub/uls/complete/l_LMpriv.zip
+2025-08-18 13:42:22,875 - INFO - Downloaded LM_licenses_20250818.zip successfully (396,343,611 bytes)
+2025-08-18 13:42:25,351 - INFO - Extracted downloads/LM_licenses_20250818.zip to downloads/extracted_LM_licenses_20250818
+2025-08-18 13:45:12,261 - INFO - Processed 5604276 records from downloads/extracted_LM_licenses_20250818/FR.dat
+2025-08-18 13:45:12,262 - INFO - Processed 5604276 records from FR.dat into frequencies table
+2025-08-18 13:46:05,933 - INFO - Processed 1488715 records from downloads/extracted_LM_licenses_20250818/EN.dat
+2025-08-18 13:46:05,934 - INFO - Processed 1488715 records from EN.dat into entities table
+2025-08-18 13:46:05,936 - ERROR - Error processing CSV file downloads/extracted_LM_licenses_20250818/HD.dat: name 'file_path' is not defined
+2025-08-18 13:46:05,936 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 13:46:59,800 - INFO - Processed 1973095 records from downloads/extracted_LM_licenses_20250818/LO.dat
+2025-08-18 13:46:59,800 - INFO - Processed 1973095 records from LO.dat into locations table
+2025-08-18 13:47:30,758 - INFO - Processed 2019307 records from downloads/extracted_LM_licenses_20250818/AN.dat
+2025-08-18 13:47:30,760 - INFO - Processed 2019307 records from AN.dat into antennas table
+2025-08-18 13:47:30,760 - INFO - Downloading LM_applications_20250818.zip from https://data.fcc.gov/download/pub/uls/complete/a_LMpriv.zip using curl (attempt 1/3)
+2025-08-18 13:47:30,761 - INFO - Running: curl -L -C - --progress-bar --max-time 600 --retry ... https://data.fcc.gov/download/pub/uls/complete/a_LMpriv.zip
+2025-08-18 13:51:17,447 - INFO - Downloaded LM_applications_20250818.zip successfully (667,456,865 bytes)
+2025-08-18 13:51:22,157 - INFO - Extracted downloads/LM_applications_20250818.zip to downloads/extracted_LM_applications_20250818
+2025-08-18 13:54:04,646 - INFO - Processed 5117409 records from downloads/extracted_LM_applications_20250818/FR.dat
+2025-08-18 13:54:04,647 - INFO - Processed 5117409 records from FR.dat into frequencies table
+2025-08-18 13:58:16,638 - INFO - Processed 5003982 records from downloads/extracted_LM_applications_20250818/EN.dat
+2025-08-18 13:58:16,638 - INFO - Processed 5003982 records from EN.dat into entities table
+2025-08-18 13:58:16,639 - ERROR - Error processing CSV file downloads/extracted_LM_applications_20250818/HD.dat: name 'file_path' is not defined
+2025-08-18 13:58:16,639 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 13:58:53,609 - INFO - Processed 1328320 records from downloads/extracted_LM_applications_20250818/LO.dat
+2025-08-18 13:58:53,610 - INFO - Processed 1328320 records from LO.dat into locations table
+2025-08-18 13:59:13,173 - INFO - Processed 1287717 records from downloads/extracted_LM_applications_20250818/AN.dat
+2025-08-18 13:59:13,175 - INFO - Processed 1287717 records from AN.dat into antennas table
+2025-08-18 13:59:13,177 - INFO - Download and processing completed. Total records: 23822821
+2025-08-18 14:13:38,080 - INFO - Database initialized successfully
+2025-08-18 14:13:38,081 - INFO - Processing existing downloaded files without downloading
+2025-08-18 14:16:32,978 - INFO - Processed 5117409 records from downloads/extracted_LM_applications_20250818/FR.dat
+2025-08-18 14:16:32,978 - INFO - Processed 5117409 records from FR.dat into frequencies table
+2025-08-18 14:22:40,651 - INFO - Processed 5003982 records from downloads/extracted_LM_applications_20250818/EN.dat
+2025-08-18 14:22:40,652 - INFO - Processed 5003982 records from EN.dat into entities table
+2025-08-18 14:22:40,652 - ERROR - Error processing CSV file downloads/extracted_LM_applications_20250818/HD.dat: name 'file_path' is not defined
+2025-08-18 14:22:40,652 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 14:23:17,311 - INFO - Processed 1328320 records from downloads/extracted_LM_applications_20250818/LO.dat
+2025-08-18 14:23:17,311 - INFO - Processed 1328320 records from LO.dat into locations table
+2025-08-18 14:23:37,203 - INFO - Processed 1287717 records from downloads/extracted_LM_applications_20250818/AN.dat
+2025-08-18 14:23:37,206 - INFO - Processed 1287717 records from AN.dat into antennas table
+2025-08-18 14:27:40,337 - INFO - Processed 5117409 records from downloads/extracted_LM_applications_20250817/FR.dat
+2025-08-18 14:27:40,338 - INFO - Processed 5117409 records from FR.dat into frequencies table
+2025-08-18 14:37:40,306 - INFO - Processed 5003982 records from downloads/extracted_LM_applications_20250817/EN.dat
+2025-08-18 14:37:40,306 - INFO - Processed 5003982 records from EN.dat into entities table
+2025-08-18 14:37:40,307 - ERROR - Error processing CSV file downloads/extracted_LM_applications_20250817/HD.dat: name 'file_path' is not defined
+2025-08-18 14:37:40,307 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 14:38:19,061 - INFO - Processed 1328320 records from downloads/extracted_LM_applications_20250817/LO.dat
+2025-08-18 14:38:19,062 - INFO - Processed 1328320 records from LO.dat into locations table
+2025-08-18 14:38:38,941 - INFO - Processed 1287717 records from downloads/extracted_LM_applications_20250817/AN.dat
+2025-08-18 14:38:38,941 - INFO - Processed 1287717 records from AN.dat into antennas table
+2025-08-18 14:51:04,631 - INFO - Processed 5604276 records from downloads/extracted_LM_licenses_20250818/FR.dat
+2025-08-18 14:51:04,632 - INFO - Processed 5604276 records from FR.dat into frequencies table
+2025-08-18 14:53:37,175 - INFO - Processed 1488715 records from downloads/extracted_LM_licenses_20250818/EN.dat
+2025-08-18 14:53:37,175 - INFO - Processed 1488715 records from EN.dat into entities table
+2025-08-18 14:53:37,176 - ERROR - Error processing CSV file downloads/extracted_LM_licenses_20250818/HD.dat: name 'file_path' is not defined
+2025-08-18 14:53:37,176 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 14:54:35,635 - INFO - Processed 1973095 records from downloads/extracted_LM_licenses_20250818/LO.dat
+2025-08-18 14:54:35,635 - INFO - Processed 1973095 records from LO.dat into locations table
+2025-08-18 14:55:06,852 - INFO - Processed 2019307 records from downloads/extracted_LM_licenses_20250818/AN.dat
+2025-08-18 14:55:06,854 - INFO - Processed 2019307 records from AN.dat into antennas table
+2025-08-18 15:08:37,429 - INFO - Processed 5604276 records from downloads/extracted_LM_licenses_20250817/FR.dat
+2025-08-18 15:08:37,429 - INFO - Processed 5604276 records from FR.dat into frequencies table
+2025-08-18 15:11:31,469 - INFO - Processed 1488715 records from downloads/extracted_LM_licenses_20250817/EN.dat
+2025-08-18 15:11:31,470 - INFO - Processed 1488715 records from EN.dat into entities table
+2025-08-18 15:11:31,470 - ERROR - Error processing CSV file downloads/extracted_LM_licenses_20250817/HD.dat: name 'file_path' is not defined
+2025-08-18 15:11:31,470 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 15:12:41,039 - INFO - Processed 1973095 records from downloads/extracted_LM_licenses_20250817/LO.dat
+2025-08-18 15:12:41,040 - INFO - Processed 1973095 records from LO.dat into locations table
+2025-08-18 15:13:12,518 - INFO - Processed 2019307 records from downloads/extracted_LM_licenses_20250817/AN.dat
+2025-08-18 15:13:12,518 - INFO - Processed 2019307 records from AN.dat into antennas table
+2025-08-18 16:52:31,661 - INFO - Database initialized successfully
+2025-08-18 16:52:31,661 - INFO - Processing existing downloaded files without downloading
+2025-08-18 18:21:35,366 - INFO - Database initialized successfully
+2025-08-18 18:21:35,368 - INFO - Processing existing downloaded files without downloading
+2025-08-18 18:22:03,549 - INFO - Processed 5117409 records from downloads/extracted_LM_applications_20250818/FR.dat
+2025-08-18 18:22:03,549 - INFO - Processed 5117409 records from FR.dat into frequencies table
+2025-08-18 18:22:36,677 - INFO - Processed 5003982 records from downloads/extracted_LM_applications_20250818/EN.dat
+2025-08-18 18:22:36,677 - INFO - Processed 5003982 records from EN.dat into entities table
+2025-08-18 18:22:36,679 - ERROR - Error processing CSV file downloads/extracted_LM_applications_20250818/HD.dat: name 'file_path' is not defined
+2025-08-18 18:22:36,679 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 18:23:02,107 - INFO - Processed 1328320 records from downloads/extracted_LM_applications_20250818/LO.dat
+2025-08-18 18:23:02,107 - INFO - Processed 1328320 records from LO.dat into locations table
+2025-08-18 18:23:22,328 - INFO - Processed 1287717 records from downloads/extracted_LM_applications_20250818/AN.dat
+2025-08-18 18:23:22,328 - INFO - Processed 1287717 records from AN.dat into antennas table
+2025-08-18 18:23:50,207 - INFO - Processed 5117409 records from downloads/extracted_LM_applications_20250817/FR.dat
+2025-08-18 18:23:50,208 - INFO - Processed 5117409 records from FR.dat into frequencies table
+2025-08-18 18:24:23,081 - INFO - Processed 5003982 records from downloads/extracted_LM_applications_20250817/EN.dat
+2025-08-18 18:24:23,082 - INFO - Processed 5003982 records from EN.dat into entities table
+2025-08-18 18:24:23,085 - ERROR - Error processing CSV file downloads/extracted_LM_applications_20250817/HD.dat: name 'file_path' is not defined
+2025-08-18 18:24:23,085 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 18:24:48,922 - INFO - Processed 1328320 records from downloads/extracted_LM_applications_20250817/LO.dat
+2025-08-18 18:24:48,922 - INFO - Processed 1328320 records from LO.dat into locations table
+2025-08-18 18:25:09,464 - INFO - Processed 1287717 records from downloads/extracted_LM_applications_20250817/AN.dat
+2025-08-18 18:25:09,464 - INFO - Processed 1287717 records from AN.dat into antennas table
+2025-08-18 18:25:40,762 - INFO - Processed 5604276 records from downloads/extracted_LM_licenses_20250818/FR.dat
+2025-08-18 18:25:40,762 - INFO - Processed 5604276 records from FR.dat into frequencies table
+2025-08-18 18:25:50,653 - INFO - Processed 1488715 records from downloads/extracted_LM_licenses_20250818/EN.dat
+2025-08-18 18:25:50,653 - INFO - Processed 1488715 records from EN.dat into entities table
+2025-08-18 18:25:50,655 - ERROR - Error processing CSV file downloads/extracted_LM_licenses_20250818/HD.dat: name 'file_path' is not defined
+2025-08-18 18:25:50,655 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 18:26:28,840 - INFO - Processed 1973095 records from downloads/extracted_LM_licenses_20250818/LO.dat
+2025-08-18 18:26:28,840 - INFO - Processed 1973095 records from LO.dat into locations table
+2025-08-18 18:27:00,418 - INFO - Processed 2019307 records from downloads/extracted_LM_licenses_20250818/AN.dat
+2025-08-18 18:27:00,418 - INFO - Processed 2019307 records from AN.dat into antennas table
+2025-08-18 18:27:31,527 - INFO - Processed 5604276 records from downloads/extracted_LM_licenses_20250817/FR.dat
+2025-08-18 18:27:31,527 - INFO - Processed 5604276 records from FR.dat into frequencies table
+2025-08-18 18:27:41,261 - INFO - Processed 1488715 records from downloads/extracted_LM_licenses_20250817/EN.dat
+2025-08-18 18:27:41,261 - INFO - Processed 1488715 records from EN.dat into entities table
+2025-08-18 18:27:41,264 - ERROR - Error processing CSV file downloads/extracted_LM_licenses_20250817/HD.dat: name 'file_path' is not defined
+2025-08-18 18:27:41,264 - INFO - Processed 0 records from HD.dat into licenses table
+2025-08-18 18:28:19,089 - INFO - Processed 1973095 records from downloads/extracted_LM_licenses_20250817/LO.dat
+2025-08-18 18:28:19,089 - INFO - Processed 1973095 records from LO.dat into locations table
+2025-08-18 18:28:50,960 - INFO - Processed 2019307 records from downloads/extracted_LM_licenses_20250817/AN.dat
+2025-08-18 18:28:50,960 - INFO - Processed 2019307 records from AN.dat into antennas table
+2025-08-18 18:30:10,982 - INFO - Database initialized successfully
+2025-08-18 18:30:10,982 - INFO - Processing existing downloaded files without downloading
+2025-08-18 18:30:39,094 - INFO - Processed 5117409 records from downloads/extracted_LM_applications_20250818/FR.dat
+2025-08-18 18:30:39,094 - INFO - Processed 5117409 records from FR.dat into frequencies table
+2025-08-18 18:31:11,977 - INFO - Processed 5003982 records from downloads/extracted_LM_applications_20250818/EN.dat
+2025-08-18 18:31:11,977 - INFO - Processed 5003982 records from EN.dat into entities table
+2025-08-18 18:31:44,509 - INFO - Processed 2658706 records from downloads/extracted_LM_applications_20250818/HD.dat
+2025-08-18 18:31:44,510 - INFO - Processed 2658706 records from HD.dat into licenses table
+2025-08-18 18:32:10,011 - INFO - Processed 1328320 records from downloads/extracted_LM_applications_20250818/LO.dat
+2025-08-18 18:32:10,011 - INFO - Processed 1328320 records from LO.dat into locations table
+2025-08-18 18:32:30,270 - INFO - Processed 1287717 records from downloads/extracted_LM_applications_20250818/AN.dat
+2025-08-18 18:32:30,270 - INFO - Processed 1287717 records from AN.dat into antennas table
+2025-08-18 18:33:00,778 - INFO - Processed 5604276 records from downloads/extracted_LM_licenses_20250818/FR.dat
+2025-08-18 18:33:00,778 - INFO - Processed 5604276 records from FR.dat into frequencies table
+2025-08-18 18:33:10,660 - INFO - Processed 1488715 records from downloads/extracted_LM_licenses_20250818/EN.dat
+2025-08-18 18:33:10,660 - INFO - Processed 1488715 records from EN.dat into entities table
+2025-08-18 18:33:20,727 - INFO - Processed 848539 records from downloads/extracted_LM_licenses_20250818/HD.dat
+2025-08-18 18:33:20,727 - INFO - Processed 848539 records from HD.dat into licenses table
+2025-08-18 18:33:58,639 - INFO - Processed 1973095 records from downloads/extracted_LM_licenses_20250818/LO.dat
+2025-08-18 18:33:58,639 - INFO - Processed 1973095 records from LO.dat into locations table
+2025-08-18 18:34:30,389 - INFO - Processed 2019307 records from downloads/extracted_LM_licenses_20250818/AN.dat
+2025-08-18 18:34:30,389 - INFO - Processed 2019307 records from AN.dat into antennas table
+2025-08-18 18:38:12,050 - INFO - Database initialized successfully

@@ -1,0 +1,14 @@
+[Unit]
+Description=FCC ULS Land Mobile Database Downloader
+After=network.target
+
+[Service]
+Type=oneshot
+User=your-username
+WorkingDirectory=/path/to/TEA-FCC
+ExecStart=/path/to/TEA-FCC/run_download.sh
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

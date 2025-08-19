@@ -1,0 +1,26 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# FCC ULS Database and Data Files
+fcc_uls.db
+fcc_uls.db*
+*.db
+*.db-*
+
+# Downloaded FCC data
+downloads/
+*.zip
+*.dat
+fcc_data/
+
+# Database backups
+*.backup
+*.backup_*

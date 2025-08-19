@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily FCC ULS Database Download
+Requires=fcc-uls-downloader.service
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target

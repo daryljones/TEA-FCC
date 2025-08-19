@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}FCC ULS - {{ callsign }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-id-card text-info"></i>
+                Callsign: {{ callsign }}
+            </h1>
+            <a href="{{ return_url }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Search Results
+            </a>
+        </div>
+
+        {% if data.license %}
+        <!-- License Information -->
+        <div class="info-section">
+            <h4><i class="fas fa-certificate text-info"></i> License Information</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Call Sign:</strong> {{ data.license[1] or 'Not available' }}</p>
+                    <p><strong>Radio Service:</strong> {{ data.license[2] or 'Not available' }}</p>
+                    <p><strong>Grant Date:</strong> {{ data.license[3] or 'Not available' }}</p>
+                    <p><strong>Expiration Date:</strong> {{ data.license[4] or 'Not available' }}</p>
+                    <p><strong>License Status:</strong> {{ data.license[36] or 'Not available' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Eligibility Rule:</strong> {{ data.license[6] or 'Not available' }}</p>
+                    <p><strong>Applicant Type:</strong> {{ data.license[7] or 'Not available' }}</p>
+                    <p><strong>Common Carrier:</strong> {{ 'Yes' if data.license[21] == 'Y' else 'No' if
+                        data.license[21] == 'N' else 'Not available' }}</p>
+                    <p><strong>Private Comm:</strong> {{ 'Yes' if data.license[23] == 'Y' else 'No' if data.license[23]
+                        == 'N' else 'Not available' }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data.licensee %}
+        <!-- Licensee Information -->
+        <div class="info-section licensee-info">
+            <h4><i class="fas fa-user text-success"></i> Licensee Information</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    {% if data.licensee[0] %}
+                    <p><strong>Entity Name:</strong> {{ data.licensee[0] }}</p>
+                    {% endif %}
+                    {% if data.licensee[2] or data.licensee[4] %}
+                    <p><strong>Contact Name:</strong>
+                        {{ data.licensee[2] or '' }} {{ data.licensee[3] or '' }} {{ data.licensee[4] or '' }}</p>
+                    {% endif %}
+                    {% if data.licensee[9] %}
+                    <p><strong>Address:</strong> {{ data.licensee[9] }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {% if data.licensee[10] or data.licensee[11] or data.licensee[12] %}
+                    <p><strong>Location:</strong>
+                        {{ data.licensee[10] or '' }}{% if data.licensee[10] and (data.licensee[11] or
+                        data.licensee[12]) %}, {% endif %}{{ data.licensee[11] or '' }} {{ data.licensee[12] or '' }}
+                    </p>
+                    {% endif %}
+                    {% if data.licensee[6] %}
+                    <p><strong>Phone:</strong> {{ data.licensee[6] }}</p>
+                    {% endif %}
+                    {% if data.licensee[8] %}
+                    <p><strong>Email:</strong> {{ data.licensee[8] }}</p>
+                    {% endif %}
+                    {% if data.licensee[15] %}
+                    <p><strong>FRN:</strong> {{ data.licensee[15] }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data.contact %}
+        <!-- Contact Information -->
+        <div class="info-section contact-info">
+            <h4><i class="fas fa-address-card text-warning"></i> Contact Information</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    {% if data.contact[0] %}
+                    <p><strong>Contact Entity:</strong> {{ data.contact[0] }}</p>
+                    {% endif %}
+                    {% if data.contact[2] or data.contact[4] %}
+                    <p><strong>Contact Name:</strong>
+                        {{ data.contact[2] or '' }} {{ data.contact[3] or '' }} {{ data.contact[4] or '' }}</p>
+                    {% endif %}
+                    {% if data.contact[9] %}
+                    <p><strong>Address:</strong> {{ data.contact[9] }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {% if data.contact[10] or data.contact[11] or data.contact[12] %}
+                    <p><strong>City:</strong>
+                        {{ data.contact[10] or '' }}{% if data.contact[10] and (data.contact[11] or data.contact[12])
+                        %}, {% endif %}{{ data.contact[11] or '' }} {{ data.contact[12] or '' }}</p>
+                    {% endif %}
+                    {% if data.contact[6] %}
+                    <p><strong>Phone:</strong> {{ data.contact[6] }}</p>
+                    {% endif %}
+                    {% if data.contact[8] %}
+                    <p><strong>Email:</strong> {{ data.contact[8] }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data.frequencies %}
+        <!-- Frequency Information -->
+        <div class="info-section frequency-info">
+            <h4><i class="fas fa-wave-square text-danger"></i> Frequency Assignments ({{ data.frequencies|length }})
+            </h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th>Freq #</th>
+                            <th>Seq ID</th>
+                            <th>Frequency (MHz)</th>
+                            <th>Upper Band</th>
+                            <th>Type</th>
+                            <th>Power Output (W)</th>
+                            <th>ERP (W)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for freq in data.frequencies %}
+                        <tr>
+                            <td>{{ freq[0] or 'N/A' }}</td>
+                            <td>{{ freq[1] or 'N/A' }}</td>
+                            <td><span class="badge frequency-badge">{{ "%.6f"|format(freq[2]) if freq[2] else 'Not
+                                    specified' }}</span></td>
+                            <td>{{ "%.6f"|format(freq[3]) if freq[3] else 'N/A' }}</td>
+                            <td>{{ freq[6] or 'N/A' }}</td>
+                            <td>{{ "%.2f"|format(freq[7]) if freq[7] else 'N/A' }}</td>
+                            <td>{{ "%.2f"|format(freq[8]) if freq[8] else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data.locations %}
+        <!-- Location Information -->
+        <div class="info-section location-info">
+            <h4><i class="fas fa-map-marker-alt text-purple"></i> Location Details ({{ data.locations|length }})</h4>
+            {% for location in data.locations %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <span class="badge location-badge">Location {{ location[0] or 'Unknown' }}</span>
+                        {% if location[33] %}
+                            {{ location[33] }}
+                        {% elif location[4] and location[6] %}
+                            {{ location[4] }}, {{ location[6] }}
+                        {% elif location[4] %}
+                            {{ location[4] }}
+                        {% elif location[6] %}
+                            {{ location[6] }}
+                        {% else %}
+                            Location {{ location[0] or 'Unknown' }}
+                        {% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if location[3] %}
+                            <p><strong>Address:</strong> {{ location[3] }}</p>
+                            {% endif %}
+                            {% if location[4] or location[6] %}
+                            <p><strong>City/State:</strong> {{ location[4] or '' }}{% if location[4] and location[6] %},
+                                {% endif %}{{ location[6] or '' }}</p>
+                            {% endif %}
+                            {% if location[5] %}
+                            <p><strong>County:</strong> {{ location[5] }}</p>
+                            {% endif %}
+                            <p><strong>Type:</strong> {{ location[1] or 'Not specified' }}</p>
+                            <p><strong>Class:</strong> {{ location[2] or 'Not specified' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if location[11] is not none and location[12] is not none %}
+                            {% set lat_decimal = location[11] + (location[12] or 0)/60 + (location[13] or 0)/3600 %}
+                            {% set long_decimal = location[15] + (location[16] or 0)/60 + (location[17] or 0)/3600 %}
+
+                            {# Handle direction indicators - if missing, assume US coordinates (N/W) #}
+                            {% if location[14] and location[14].upper() == 'S' %}
+                            {% set lat_decimal = -lat_decimal %}
+                            {% endif %}
+
+                            {# For longitude: if direction is W or missing (assume US location), make negative #}
+                            {% if not location[18] or location[18].upper() == 'W' %}
+                            {% set long_decimal = -long_decimal %}
+                            {% endif %}
+
+                            <p><strong>Coordinates:</strong>
+                                {{ "%.6f"|format(lat_decimal) }}, {{ "%.6f"|format(long_decimal) }}
+                                <br><small class="text-muted">
+                                    Original: {{ location[11] }}°{{ location[12] }}'{{ location[13] or '?' }}"{{
+                                    location[14] or 'N' }}
+                                    {{ location[15] }}°{{ location[16] }}'{{ location[17] or '?' }}"{{ location[18] or
+                                    'W' }}
+                                    <br>Note: Coordinates may use NAD83 datum; precision limited by available data
+                                </small>
+                                <br><a href="https://www.google.com/maps/search/?api=1&query={{ "
+                                    %.6f"|format(lat_decimal) }},{{ "%.6f" |format(long_decimal) }}" target="_blank"
+                                    class="btn btn-sm btn-outline-primary mt-1">
+                                    <i class="fas fa-map-marker-alt"></i> View on Google Maps
+                                </a>
+                            </p>
+                            {% endif %}
+                            {% if location[10] %}
+                            <p><strong>Ground Elevation:</strong> {{ location[10] }} ft</p>
+                            {% endif %}
+                            {% if location[30] or location[31] %}
+                            <p><strong>Structure Height:</strong>
+                                {{ location[30] or 'N/A' }} ft (Support: {{ location[31] or 'N/A' }} ft)</p>
+                            {% endif %}
+                            {% if location[29] %}
+                            <p><strong>Tower Registration:</strong> {{ location[29] }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if location[34] or location[35] or location[36] or location[37] or location[38] %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>Equipment Units:</h6>
+                            <div class="row">
+                                {% if location[34] %}<div class="col-md-2"><small>Hand Held: {{ location[34] }}</small>
+                                </div>{% endif %}
+                                {% if location[35] %}<div class="col-md-2"><small>Mobile: {{ location[35] }}</small>
+                                </div>{% endif %}
+                                {% if location[36] %}<div class="col-md-2"><small>Temp Fixed: {{ location[36] }}</small>
+                                </div>{% endif %}
+                                {% if location[37] %}<div class="col-md-2"><small>Aircraft: {{ location[37] }}</small>
+                                </div>{% endif %}
+                                {% if location[38] %}<div class="col-md-2"><small>Itinerant: {{ location[38] }}</small>
+                                </div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if not data.license %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            No license information found for callsign {{ callsign }}.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,2 @@
+# Flask Web Application Dependencies
+flask>=2.3.0
