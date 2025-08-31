@@ -274,7 +274,7 @@ class FCCULSDownloader:
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS entities (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        unique_system_identifier TEXT,
+                        unique_system_identifier TEXT UNIQUE,
                         uls_file_number TEXT,
                         ebf_number TEXT,
                         call_sign TEXT,
@@ -342,7 +342,8 @@ class FCCULSDownloader:
                         status_code TEXT,
                         status_date TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (unique_system_identifier) REFERENCES licenses (unique_system_identifier)
+                        FOREIGN KEY (unique_system_identifier) REFERENCES licenses (unique_system_identifier),
+                        UNIQUE(unique_system_identifier, frequency_number, frequency_seq_id)
                     )
                 ''')
                 
@@ -401,7 +402,8 @@ class FCCULSDownloader:
                         status_date TEXT,
                         earth_station_agreement TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (unique_system_identifier) REFERENCES licenses (unique_system_identifier)
+                        FOREIGN KEY (unique_system_identifier) REFERENCES licenses (unique_system_identifier),
+                        UNIQUE(unique_system_identifier, location_number)
                     )
                 ''')
                 
@@ -447,7 +449,8 @@ class FCCULSDownloader:
                         status_code TEXT,
                         status_date TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (unique_system_identifier) REFERENCES licenses (unique_system_identifier)
+                        FOREIGN KEY (unique_system_identifier) REFERENCES licenses (unique_system_identifier),
+                        UNIQUE(unique_system_identifier, antenna_number, location_number)
                     )
                 ''')
                 
@@ -463,9 +466,20 @@ class FCCULSDownloader:
                         status_code TEXT,
                         status_date TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (unique_system_identifier) REFERENCES licenses (unique_system_identifier)
+                        FOREIGN KEY (unique_system_identifier) REFERENCES licenses (unique_system_identifier),
+                        UNIQUE(unique_system_identifier, purpose_code)
                     )
                 ''')
+                
+                # Create unique indexes for INSERT OR REPLACE to work properly
+                try:
+                    cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_entities_unique ON entities(unique_system_identifier)')
+                    cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_frequencies_unique ON frequencies(unique_system_identifier, frequency_number, frequency_seq_id)')
+                    cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_locations_unique ON locations(unique_system_identifier, location_number)')
+                    cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_antennas_unique ON antennas(unique_system_identifier, antenna_number, location_number)')
+                    cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_application_purpose_unique ON application_purpose(unique_system_identifier, purpose_code)')
+                except sqlite3.Error as e:
+                    logger.warning(f"Error creating unique indexes: {e}")
                 
                 conn.commit()
                 logger.info("Database initialized successfully")
@@ -560,11 +574,6 @@ class FCCULSDownloader:
             with open(csv_path, 'r', encoding='utf-8', errors='ignore') as csvfile:
                 reader = csv.reader(csvfile, delimiter='|')
                 
-                # Skip header if present
-                first_row = next(reader, None)
-                if first_row is None:
-                    return 0
-                
                 with sqlite3.connect(self.db_path) as conn:
                     cursor = conn.cursor()
                     
@@ -580,30 +589,39 @@ class FCCULSDownloader:
                                     grant_date = row[7] if len(row) > 7 else None
                                     expired_date = row[8] if len(row) > 8 else None
                                     
-                                    # If this is application data and we have license data with dates, skip
-                                    if not is_license_data and grant_date in [None, ''] and expired_date in [None, '']:
-                                        # Check if we already have license data with valid dates
+                                    # Determine data quality and decide whether to process
+                                    should_process = True
+                                    
+                                    if not is_license_data:
+                                        # For application data, check if we already have better license data
                                         cursor.execute('''
-                                            SELECT grant_date, expired_date FROM licenses 
-                                            WHERE unique_system_identifier = ? AND 
-                                            (grant_date IS NOT NULL AND grant_date != '') AND
-                                            (expired_date IS NOT NULL AND expired_date != '')
+                                            SELECT license_status, grant_date, expired_date FROM licenses 
+                                            WHERE unique_system_identifier = ?
                                         ''', (unique_system_identifier,))
                                         existing = cursor.fetchone()
+                                        
                                         if existing:
-                                            # Skip this application record since we have better license data
-                                            continue
+                                            existing_status, existing_grant, existing_expired = existing
+                                            
+                                            # If existing record is a granted license with dates, prefer it over application
+                                            if (existing_status and existing_status.upper() in ['ACTIVE', 'GRANTED', 'LICENSED'] and
+                                                existing_grant and existing_grant.strip() and
+                                                existing_expired and existing_expired.strip()):
+                                                # Only skip if application has no dates or is clearly inferior
+                                                if (not grant_date or not grant_date.strip()) and (not expired_date or not expired_date.strip()):
+                                                    should_process = False
                                     
-                                    # Skip the first field (record type "HD") and use the next 58 fields
-                                    cursor.execute('''
-                                        INSERT OR REPLACE INTO licenses (
-                                            unique_system_identifier, uls_file_number, ebf_number,
-                                            call_sign, license_status, radio_service_type,
-                                            grant_date, expired_date, cancellation_date,
-                                            eligibility_rule_num, applicant_type_code, alien,
-                                            alien_government, alien_corporation, alien_officer,
-                                            alien_control, revoked, convicted, adjudged,
-                                            involved_reserved, common_carrier, non_common_carrier,
+                                    if should_process:
+                                        # Skip the first field (record type "HD") and use the next 58 fields
+                                        cursor.execute('''
+                                            INSERT OR REPLACE INTO licenses (
+                                                unique_system_identifier, uls_file_number, ebf_number,
+                                                call_sign, license_status, radio_service_type,
+                                                grant_date, expired_date, cancellation_date,
+                                                eligibility_rule_num, applicant_type_code, alien,
+                                                alien_government, alien_corporation, alien_officer,
+                                                alien_control, revoked, convicted, adjudged,
+                                                involved_reserved, common_carrier, non_common_carrier,
                                             private_comm, fixed, mobile, radiolocation,
                                             satellite, developmental_or_sta, interconnected_service,
                                             certifier_first_name, certifier_mi, certifier_last_name,
@@ -618,7 +636,7 @@ class FCCULSDownloader:
                                             transition_plan_cert_900, return_spectrum_cert_900,
                                             payment_cert_900
                                         ) VALUES (''' + ','.join(['?'] * 58) + ')', row[1:59])
-                                    records_processed += 1
+                                        records_processed += 1
                                 except sqlite3.Error as e:
                                     logger.warning(f"Error inserting license record: {e}")
                     
@@ -627,6 +645,20 @@ class FCCULSDownloader:
                         for row in reader:
                             if len(row) >= 30:  # Basic validation - need 30 fields (including record type)
                                 try:
+                                    # Skip records with empty call signs to avoid overwriting valid license entities
+                                    call_sign = row[4].strip() if len(row) > 4 else ''
+                                    if not call_sign:
+                                        continue
+                                    
+                                    # Check if this record would overwrite an existing license entity with a different call sign
+                                    unique_system_identifier = row[1].strip() if len(row) > 1 else ''
+                                    if unique_system_identifier:
+                                        cursor.execute('SELECT call_sign FROM entities WHERE unique_system_identifier = ?', (unique_system_identifier,))
+                                        existing = cursor.fetchone()
+                                        if existing and existing[0] and existing[0] != call_sign:
+                                            # Skip this record to preserve the existing license entity
+                                            continue
+                                    
                                     cursor.execute('''
                                         INSERT OR REPLACE INTO entities (
                                             unique_system_identifier, uls_file_number, ebf_number,
@@ -644,48 +676,76 @@ class FCCULSDownloader:
                     
                     elif table_name == 'frequencies':
                         # Process frequency data (FR.dat)
+                        # Determine if this is license data or application data based on file path
+                        is_license_data = 'licenses' in str(csv_path).lower()
+                        
+                        def safe_float(value):
+                            try:
+                                return float(value) if value and value.strip() else None
+                            except ValueError:
+                                return None
+                        
+                        def safe_int(value):
+                            try:
+                                return int(value) if value and value.strip() else None
+                            except ValueError:
+                                return None
+                        
+                        def safe_str(value):
+                            return value.strip() if value and value.strip() else None
+                        
                         for row in reader:
                             if len(row) >= 18:  # Basic validation - need 18 fields (including record type)
                                 try:
-                                    # Map fields based on actual FR.dat structure:
-                                    # 0:FR, 1:unique_sys_id, 2:uls_file_num, 3:ebf_num, 4:call_sign, 
-                                    # 5:status_code, 6:freq_num, 7:freq_seq_id, 8:emission, 9:empty,
-                                    # 10:frequency_assigned, 11-14:empty, 15:power_output, 16:power_erp
-                                    
-                                    def safe_float(value):
-                                        try:
-                                            return float(value) if value and value.strip() else None
-                                        except ValueError:
-                                            return None
-                                    
-                                    def safe_int(value):
-                                        try:
-                                            return int(value) if value and value.strip() else None
-                                        except ValueError:
-                                            return None
-                                    
-                                    def safe_str(value):
-                                        return value.strip() if value and value.strip() else None
-                                    
-                                    # Extract and map the correct fields
-                                    processed_data = [
-                                        safe_str(row[1]),   # unique_system_identifier
-                                        safe_str(row[2]),   # uls_file_number 
-                                        safe_str(row[3]),   # ebf_number
-                                        safe_str(row[4]),   # call_sign
-                                        safe_float(row[10]), # frequency_assigned (field 10!)
-                                        None,               # frequency_upper_band (not in data)
-                                        None,               # frequency_carrier (not in data)  
-                                        None,               # frequency_offset (not in data)
-                                        safe_str(row[8]),   # emission_designator (field 8)
-                                        safe_float(row[15]) if len(row) > 15 else None, # power_output (field 15)
-                                        safe_float(row[16]) if len(row) > 16 else None, # power_erp (field 16)
-                                        None,               # tolerance (not in data)
-                                        safe_int(row[6]),   # frequency_number (field 6)
-                                        safe_int(row[7]),   # frequency_seq_id (field 7)
-                                        safe_str(row[5]),   # status_code (field 5)
-                                        safe_str(row[17]) if len(row) > 17 else None   # status_date (field 17)
-                                    ]
+                                    # Map fields based on data source
+                                    if is_license_data:
+                                        # Licenses FR.dat structure:
+                                        # 0:FR, 1:unique_sys_id, 2:uls_file_num, 3:ebf_num, 4:call_sign, 
+                                        # 5:status_code, 6:freq_num, 7:freq_seq_id, 8:emission, 9:empty,
+                                        # 10:frequency_assigned, 11-14:empty, 15:power_output, 16:power_erp
+                                        
+                                        processed_data = [
+                                            safe_str(row[1]),   # unique_system_identifier
+                                            safe_str(row[2]),   # uls_file_number 
+                                            safe_str(row[3]),   # ebf_number
+                                            safe_str(row[4]),   # call_sign
+                                            safe_float(row[10]), # frequency_assigned
+                                            None,               # frequency_upper_band
+                                            None,               # frequency_carrier  
+                                            None,               # frequency_offset
+                                            safe_str(row[8]),   # emission_designator
+                                            safe_float(row[15]) if len(row) > 15 else None, # power_output
+                                            safe_float(row[16]) if len(row) > 16 else None, # power_erp
+                                            None,               # tolerance
+                                            safe_int(row[6]),   # frequency_number
+                                            safe_int(row[7]),   # frequency_seq_id
+                                            safe_str(row[5]),   # status_code
+                                            safe_str(row[17]) if len(row) > 17 else None   # status_date
+                                        ]
+                                    else:
+                                        # Applications FR.dat structure:
+                                        # 0:FR, 1:unique_sys_id, 2:application_id?, 3:empty, 4:application_type?, 
+                                        # 5:freq_num?, 6:freq_seq_id?, 7:emission?, 8:empty, 9:frequency_assigned?
+                                        # Note: Applications data may not have call_sign, so we'll set it to None
+                                        
+                                        processed_data = [
+                                            safe_str(row[1]),   # unique_system_identifier
+                                            None,               # uls_file_number (not available)
+                                            safe_str(row[2]),   # ebf_number (using application_id)
+                                            None,               # call_sign (not available in applications)
+                                            safe_float(row[10]) if len(row) > 10 else None, # frequency_assigned
+                                            None,               # frequency_upper_band
+                                            None,               # frequency_carrier  
+                                            None,               # frequency_offset
+                                            safe_str(row[8]) if len(row) > 8 else None, # emission_designator
+                                            None,               # power_output (not in same position)
+                                            None,               # power_erp (not in same position)
+                                            None,               # tolerance
+                                            safe_int(row[6]) if len(row) > 6 else None, # frequency_number
+                                            safe_int(row[7]) if len(row) > 7 else None, # frequency_seq_id
+                                            None,               # status_code
+                                            None                # status_date
+                                        ]
                                     
                                     cursor.execute('''
                                         INSERT OR REPLACE INTO frequencies (

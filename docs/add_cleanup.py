@@ -49,7 +49,7 @@ def add_cleanup_to_main():
 '''
     
     # Read main.py
-    with open('main.py', 'r') as f:
+    with open('../main.py', 'r') as f:
         content = f.read()
     
     # Find the FCCULSDownloader class and add the cleanup method
@@ -91,7 +91,7 @@ def add_cleanup_to_main():
         new_content = new_content[:line_end] + cleanup_call + new_content[line_end:]
     
     # Write the updated content
-    with open('main.py', 'w') as f:
+    with open('../main.py', 'w') as f:
         f.write(new_content)
     
     return True

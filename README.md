@@ -12,7 +12,7 @@ uv sync
 uv run python main.py --download-now
 
 # Look up any callsign
-uv run python callsign_lookup.py KA21141
+uv run python scripts/callsign_lookup.py KA21141
 ```
 
 ## Features
@@ -30,10 +30,10 @@ uv run python callsign_lookup.py KA21141
 Downloads can consume significant disk space (~7.5GB per update). The system includes automatic cleanup:
 
 - **Automatic cleanup**: Removes files older than 7 days after successful downloads
-- **Manual cleanup**: Use `uv run python cleanup_downloads.py --help` for options
+- **Manual cleanup**: Use `uv run python scripts/cleanup_downloads.py --help` for options
 - **Configuration**: Adjust retention in `config.py` (FILE_CLEANUP_DAYS)
 
-See `DISK_SPACE_MANAGEMENT.md` for detailed cleanup options.
+See `docs/DISK_SPACE_MANAGEMENT.md` for detailed cleanup options.
 
 ## Web Application
 
@@ -41,10 +41,10 @@ The project includes a Flask-based web interface for easier searching:
 
 ```bash
 # Start development server
-./run_webapp.sh
+./scripts/run_webapp.sh
 
 # Or start production server
-./run_webapp_production.sh
+./scripts/run_webapp_production.sh
 ```
 
 Access the web interface at http://localhost:5001 (development) or http://localhost:8000 (production).
@@ -72,7 +72,7 @@ Options:
 
 ### Callsign Lookup
 ```bash
-uv run python callsign_lookup.py <CALLSIGN>
+uv run python scripts/callsign_lookup.py <CALLSIGN>
 ```
 
 ## Database Schema
@@ -84,7 +84,7 @@ uv run python callsign_lookup.py <CALLSIGN>
 - antennas: Antenna specifications
 - application_purpose: Application purpose codes
 
-See DATABASE_SCHEMA.md for complete documentation.
+See docs/DATABASE_SCHEMA.md for complete documentation.
 
 ## Version
 

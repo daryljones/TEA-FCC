@@ -9,7 +9,7 @@ def fix_file_path_error():
     """Fix the undefined file_path variable in main.py."""
     
     # Read the current main.py
-    with open('main.py', 'r') as f:
+    with open('../main.py', 'r') as f:
         content = f.read()
     
     # Replace the problematic line
@@ -20,7 +20,7 @@ def fix_file_path_error():
         content = content.replace(original, fixed)
         
         # Write back the fixed content
-        with open('main.py', 'w') as f:
+        with open('../main.py', 'w') as f:
             f.write(content)
         
         print("✅ Fixed file_path error in main.py")

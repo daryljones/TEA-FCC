@@ -331,7 +331,16 @@ function displayLicenseeResults(data) {
     `;
     
     data.results.forEach(result => {
-        const [callsign, entity_name, first_name, last_name, city, state, grant_date, expired_date] = result;
+        // Handle new dictionary format
+        const callsign = result.call_sign;
+        const entity_name = result.entity_name;
+        const first_name = result.first_name;
+        const last_name = result.last_name;
+        const city = result.city;
+        const state = result.state;
+        const grant_date = result.earliest_grant_date;
+        const expired_date = result.latest_expired_date;
+        
         const fullName = entity_name || `${first_name || ''} ${last_name || ''}`.trim();
         const location = `${city || ''}, ${state || ''}`.replace(/^,\s*|,\s*$/g, '') || 'Not specified';
         
@@ -345,10 +354,42 @@ function displayLicenseeResults(data) {
         const returnUrl = `/?${returnParams.toString()}#licensee-results`;
         const detailUrl = `/callsign/${callsign}?return=${encodeURIComponent(returnUrl)}`;
         
+        // Build frequency summary
+        let freqSummary = '';
+        if (result.frequency_count > 0) {
+            if (result.frequency_count === 1) {
+                freqSummary = `<small class="text-muted"><i class="fas fa-wave-square"></i> ${result.frequency_list} MHz</small>`;
+            } else if (result.frequency_count <= 5) {
+                freqSummary = `<small class="text-muted"><i class="fas fa-wave-square"></i> ${result.frequency_count} freqs: ${result.frequency_list} MHz</small>`;
+            } else {
+                freqSummary = `<small class="text-muted"><i class="fas fa-wave-square"></i> ${result.frequency_count} frequencies: ${result.min_frequency}-${result.max_frequency} MHz</small>`;
+            }
+        } else {
+            freqSummary = '<small class="text-muted"><i class="fas fa-wave-square"></i> No frequencies</small>';
+        }
+        
+        // Build location summary
+        let locationSummary = '';
+        if (result.location_count > 0) {
+            if (result.location_count === 1) {
+                locationSummary = `<small class="text-muted"><i class="fas fa-map-marker-alt"></i> ${result.locations}</small>`;
+            } else {
+                const uniqueLocations = result.locations.split(',').slice(0, 3).join(',');
+                const moreText = result.location_count > 3 ? ` +${result.location_count - 3} more` : '';
+                locationSummary = `<small class="text-muted"><i class="fas fa-map-marker-alt"></i> ${result.location_count} sites: ${uniqueLocations}${moreText}</small>`;
+            }
+        } else {
+            locationSummary = '<small class="text-muted"><i class="fas fa-map-marker-alt"></i> No locations</small>';
+        }
+        
         html += `
             <tr>
                 <td><a href="${detailUrl}" class="btn btn-sm btn-outline-primary">${callsign}</a></td>
-                <td>${fullName}</td>
+                <td>
+                    ${fullName}
+                    <br>${freqSummary}
+                    <br>${locationSummary}
+                </td>
                 <td>${location}</td>
                 <td>${formatDate(grant_date)}</td>
                 <td>${formatDate(expired_date)}</td>

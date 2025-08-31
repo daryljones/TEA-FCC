@@ -43,9 +43,9 @@ class FCCLookup:
                        l.interconnected_service, l.certifier_first_name, l.certifier_last_name,
                        l.certifier_suffix, l.certifier_title, l.gender, l.african_american,
                        l.native_american, l.hawaiian, l.asian, l.white, l.ethnicity, l.license_status
-                FROM licenses l
-                LEFT JOIN entities e ON l.call_sign = e.call_sign AND e.entity_type = 'L'
-                WHERE l.call_sign = ?
+                FROM entities e
+                LEFT JOIN licenses l ON e.call_sign = l.call_sign
+                WHERE e.call_sign = ? AND e.entity_type IN ('L', 'CL')
                 ORDER BY 
                     CASE 
                         WHEN l.license_status IS NOT NULL AND l.license_status != '' 
@@ -61,13 +61,13 @@ class FCCLookup:
             if not license_info:
                 return {"error": "Callsign not found"}
             
-            # Get licensee information (entity_type = 'L')
+            # Get licensee information (entity_type = 'L' or 'CL')
             cursor.execute("""
-                SELECT entity_name, entity_type, first_name, mi, last_name,
-                       suffix, phone, fax, email, street_address, city, state, zip_code,
-                       po_box, attention_line, frn, applicant_type_code
+                SELECT entity_name, first_name, last_name, city, state, 
+                       zip_code, phone, fax, email, applicant_type_code, entity_type
                 FROM entities 
-                WHERE call_sign = ? AND entity_type = 'L'
+                WHERE call_sign = ? AND entity_type IN ('L', 'CL')
+                ORDER BY entity_type
             """, (callsign.upper(),))
             
             licensee_info = cursor.fetchone()
@@ -125,7 +125,7 @@ class FCCLookup:
             }
     
     def search_by_licensee(self, name: str, state: Optional[str] = None, limit: int = 150) -> List[Dict[str, Any]]:
-        """Search by licensee name using simple case-insensitive string match with wildcard at end."""
+        """Search by licensee name using simple case-insensitive string match with wildcard at end. Only shows licensed records."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
             
@@ -133,15 +133,17 @@ class FCCLookup:
             name_upper = name.upper().strip()
             
             # Build query with GROUP BY to eliminate duplicates per callsign
+            # Only include records with actual call signs (licensed records)
             query = """
                 SELECT e.call_sign, e.entity_name, e.first_name, e.last_name,
                        e.city, e.state, 
                        MIN(l.grant_date) as earliest_grant_date, 
                        MAX(l.expired_date) as latest_expired_date
                 FROM entities e
-                JOIN licenses l ON e.unique_system_identifier = l.unique_system_identifier
-                WHERE e.entity_type = 'L'
+                INNER JOIN licenses l ON e.call_sign = l.call_sign
+                WHERE e.entity_type IN ('L', 'CL')
                 AND e.call_sign IS NOT NULL AND e.call_sign != ''
+                AND l.call_sign IS NOT NULL AND l.call_sign != ''
                 AND (
                     UPPER(e.entity_name) LIKE ? OR 
                     UPPER(e.first_name || ' ' || e.last_name) LIKE ?
@@ -166,42 +168,99 @@ class FCCLookup:
             params.append(limit)
             
             cursor.execute(query, params)
-            return cursor.fetchall()
+            results = cursor.fetchall()
+            
+            # Enhance results with frequency and location summaries
+            enhanced_results = []
+            for result in results:
+                call_sign = result[0]
+                
+                # Get frequency summary
+                cursor.execute("""
+                    SELECT COUNT(*) as freq_count,
+                           MIN(frequency_assigned) as min_freq,
+                           MAX(frequency_assigned) as max_freq,
+                           GROUP_CONCAT(DISTINCT printf('%.4f', frequency_assigned) ORDER BY frequency_assigned) as freq_list
+                    FROM frequencies 
+                    WHERE call_sign = ? AND frequency_assigned IS NOT NULL
+                """, (call_sign,))
+                freq_summary = cursor.fetchone()
+                
+                # Get location summary
+                cursor.execute("""
+                    SELECT COUNT(*) as loc_count,
+                           GROUP_CONCAT(DISTINCT location_city || ', ' || location_state ORDER BY location_city) as locations
+                    FROM locations 
+                    WHERE call_sign = ? AND location_city IS NOT NULL AND location_city != ''
+                """, (call_sign,))
+                loc_summary = cursor.fetchone()
+                
+                # Combine all data
+                enhanced_result = {
+                    'call_sign': call_sign,
+                    'entity_name': result[1],
+                    'first_name': result[2],
+                    'last_name': result[3],
+                    'city': result[4],
+                    'state': result[5],
+                    'earliest_grant_date': result[6],
+                    'latest_expired_date': result[7],
+                    'frequency_count': freq_summary[0] if freq_summary else 0,
+                    'min_frequency': freq_summary[1] if freq_summary else None,
+                    'max_frequency': freq_summary[2] if freq_summary else None,
+                    'frequency_list': freq_summary[3] if freq_summary else '',
+                    'location_count': loc_summary[0] if loc_summary else 0,
+                    'locations': loc_summary[1] if loc_summary else ''
+                }
+                enhanced_results.append(enhanced_result)
+            
+            return enhanced_results
     
     def search_by_frequency(self, frequency: float, tolerance: float = 0.001, 
                           state: Optional[str] = None, limit: int = 150) -> List[Dict[str, Any]]:
-        """Search by frequency, eliminating duplicates per callsign."""
+        """Search by frequency, only showing licensed records (no applications)."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
             
             freq_min = frequency - tolerance
             freq_max = frequency + tolerance
             
+            # Query for licensed records only (with both call signs and active licenses)
             query = """
-                SELECT l.call_sign, e.entity_name, e.first_name, e.last_name,
-                       e.city, e.state, f.frequency_assigned,
+                SELECT l.call_sign, 
+                       COALESCE(e.entity_name, 'Unknown Licensee') as entity_name, 
+                       COALESCE(e.first_name, '') as first_name, 
+                       COALESCE(e.last_name, '') as last_name,
+                       COALESCE(e.city, '') as city, 
+                       COALESCE(e.state, '') as state, 
+                       f.frequency_assigned,
                        MAX(COALESCE(f.power_erp, f.power_output, 0)) as max_power,
-                       GROUP_CONCAT(DISTINCT f.emission_designator) as emissions
-                FROM licenses l
-                JOIN entities e ON l.call_sign = e.call_sign AND e.entity_type = 'L'
-                JOIN frequencies f ON l.call_sign = f.call_sign
-                WHERE f.frequency_assigned BETWEEN ? AND ?
+                       GROUP_CONCAT(DISTINCT f.emission_designator) as emissions,
+                       'licensed' as record_type
+                FROM frequencies f
+                INNER JOIN licenses l ON f.call_sign = l.call_sign
+                LEFT JOIN entities e ON f.call_sign = e.call_sign AND e.entity_type IN ('L', 'CL')
+                WHERE f.call_sign IS NOT NULL 
+                AND l.call_sign IS NOT NULL
+                AND f.frequency_assigned BETWEEN ? AND ?
             """
             params = [freq_min, freq_max]
             
-            if state:
-                query += " AND e.state = ?"
+            if state and state.upper() != '':
+                query += " AND (e.state = ? OR e.state IS NULL)"
                 params.append(state.upper())
             
             query += """
-                GROUP BY l.call_sign, f.frequency_assigned
-                ORDER BY f.frequency_assigned, e.entity_name 
+                GROUP BY f.call_sign, f.frequency_assigned
+                ORDER BY f.frequency_assigned, COALESCE(e.entity_name, f.call_sign)
                 LIMIT ?
             """
             params.append(limit)
             
             cursor.execute(query, params)
-            return cursor.fetchall()
+            results = cursor.fetchall()
+            
+            return results
 
 # Initialize the lookup service
 fcc_lookup = FCCLookup(DB_PATH)

@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=oneshot
-User=your-username
-WorkingDirectory=/path/to/TEA-FCC
-ExecStart=/path/to/TEA-FCC/run_download.sh
+User=daryl
+WorkingDirectory=/home/daryl/Python_Projects/TEA-FCC
+ExecStart=/home/daryl/Python_Projects/TEA-FCC/scripts/run_download.sh
 StandardOutput=journal
 StandardError=journal
 

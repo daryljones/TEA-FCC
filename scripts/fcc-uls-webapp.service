@@ -1,0 +1,18 @@
+[Unit]
+Description=FCC ULS Web Application
+After=network.target
+
+[Service]
+Type=forking
+User=daryl
+Group=daryl
+WorkingDirectory=/home/daryl/Python_Projects/TEA-FCC/webapp
+ExecStart=/usr/bin/uv run gunicorn --config gunicorn.conf.py --daemon app:app
+ExecStop=/bin/kill -TERM $MAINPID
+ExecReload=/bin/kill -HUP $MAINPID
+PIDFile=/tmp/fcc-webapp.pid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

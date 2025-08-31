@@ -20,7 +20,7 @@ def create_indexes(db_path='fcc_uls.db'):
         cursor = conn.cursor()
         
         # Read and execute index creation SQL
-        with open('create_indexes.sql', 'r') as f:
+        with open('sql/create_indexes.sql', 'r') as f:
             sql_commands = f.read()
         
         # Split by semicolon and execute each command

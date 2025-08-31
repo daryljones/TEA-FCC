@@ -7,11 +7,11 @@
     
     <key>ProgramArguments</key>
     <array>
-        <string>/path/to/TEA-FCC/run_download.sh</string>
+        <string>/home/daryl/Python_Projects/TEA-FCC/scripts/run_download.sh</string>
     </array>
     
     <key>WorkingDirectory</key>
-    <string>/path/to/TEA-FCC</string>
+    <string>/home/daryl/Python_Projects/TEA-FCC</string>
     
     <key>StartCalendarInterval</key>
     <dict>
@@ -22,10 +22,10 @@
     </dict>
     
     <key>StandardOutPath</key>
-    <string>/path/to/TEA-FCC/launchd.log</string>
+    <string>/home/daryl/Python_Projects/TEA-FCC/launchd.log</string>
     
     <key>StandardErrorPath</key>
-    <string>/path/to/TEA-FCC/launchd.log</string>
+    <string>/home/daryl/Python_Projects/TEA-FCC/launchd.log</string>
     
     <key>RunAtLoad</key>
     <false/>
